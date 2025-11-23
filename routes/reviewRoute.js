@@ -3,6 +3,6 @@ import { getAllReviews } from '../controller/reviewController.js';
 
 const router = express.Router();
 
-router.get('/user', getAllReviews);
+router.get('/', getAllReviews);
 
 export default router;

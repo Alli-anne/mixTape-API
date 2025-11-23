@@ -1,9 +1,10 @@
 // controller/songController.js
 
-//const Song = require('../models/'); // adjust the path as needed
+import db from '../models/index.js';
+const Song = db.song;
 
 // GET all songs
-exports.getAllSongs = async (req, res) => {
+const getAllSongs = async (req, res) => {
   try {
     const songs = await Song.find();
     res.status(200).json({ success: true, data: songs });
@@ -13,7 +14,7 @@ exports.getAllSongs = async (req, res) => {
 };
 
 // GET a single song by ID
-exports.getSongById = async (req, res) => {
+const getSongById = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
 
@@ -28,7 +29,7 @@ exports.getSongById = async (req, res) => {
 };
 
 // CREATE a song
-exports.createSong = async (req, res) => {
+const createSong = async (req, res) => {
   try {
     const newSong = await Song.create(req.body);
     res.status(201).json({ success: true, data: newSong });
@@ -38,7 +39,7 @@ exports.createSong = async (req, res) => {
 };
 
 // UPDATE a song
-exports.updateSong = async (req, res) => {
+const updateSong = async (req, res) => {
   try {
     const updatedSong = await Song.findByIdAndUpdate(
       req.params.id,
@@ -57,7 +58,7 @@ exports.updateSong = async (req, res) => {
 };
 
 // DELETE a song
-exports.deleteSong = async (req, res) => {
+const deleteSong = async (req, res) => {
   try {
     const deleted = await Song.findByIdAndDelete(req.params.id);
 
@@ -70,3 +71,11 @@ exports.deleteSong = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export {
+  getAllSongs,
+  getSongById,
+  createSong,
+  updateSong,
+  deleteSong
+}

@@ -3,6 +3,6 @@ import { getAllSongs } from '../controller/songController.js';
 
 const router = express.Router();
 
-router.get('/user', getAllSongs);
+router.get('/', getAllSongs);
 
 export default router;

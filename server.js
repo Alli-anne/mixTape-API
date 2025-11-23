@@ -2,9 +2,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import { initDb, getDb } from './database/connect.js';
-import userRoutes from './routes/userRoute.js';
-const { auth } = require('express-openid-connect');
-require('dotenv').config();
+import routes from './routes/index.js';
+import pkg from 'express-openid-connect';
+const { auth } = pkg;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,13 +34,13 @@ app.get('/', (req, res) => {
 });
 
 
-app.use('/', userRoutes);
+app.use('/', routes);
 
 
 initDb()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Connected to DB and listening on ${PORT}`);
+      console.log(`Connected to DB and listening on http://127.0.0.1:${PORT}`);
     });
   })
   .catch((err) => {
