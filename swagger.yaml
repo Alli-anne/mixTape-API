@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: MixTape API
+  description: API documentation for MixTape
+  version: 1.0.0
+
+servers:
+  - url: https://mixtape-api-63j6.onrender.com
+  - url: http://localhost:3000
+
+paths:
+  /users/:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: List of all users
+        '500':
+          description: Internal Server Error
+
+  /songs/:
+    get:
+      summary: Get songs
+      responses:
+        '200':
+          description: List of songs
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a new song
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  
+  /songs/{id}:
+    get:
+      summary: Get song by ID
+      responses:
+        '200':
+          description: song information
+        '500':
+          description: Internal Server Error
+    
+    put:
+      summary: Update song
+      requestBody:
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      
+    delete:
+      summary: Delete Song
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  
+
+  /reviews/:
+    get:
+      summary: Get reviews
+      responses:
+        '200': 
+          description: List of reviews
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a new review
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /reviews/{id}:
+    get:
+      summary: Get review by ID
+      responses:
+        '200': 
+          description: review information
+        '500':
+          description: Internal Server Error
+
+    put:
+      summary: Update review
+      requestBody:
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+   
+    delete:
+      summary: Delete task
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error

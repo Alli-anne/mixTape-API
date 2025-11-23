@@ -1,9 +1,10 @@
 // controller/reviewController.js
 
-//const Review = require('../models/'); // adjust path if needed
+import db from '../models/index.js';
+const Review = db.review;
 
 // GET all reviews
-exports.getAllReviews = async (req, res) => {
+const getAllReviews = async (req, res) => {
   try {
     const reviews = await Review.find();
     res.status(200).json({ success: true, data: reviews });
@@ -13,7 +14,7 @@ exports.getAllReviews = async (req, res) => {
 };
 
 // GET single review by ID
-exports.getReviewById = async (req, res) => {
+const getReviewById = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
 
@@ -28,7 +29,7 @@ exports.getReviewById = async (req, res) => {
 };
 
 // CREATE a review
-exports.createReview = async (req, res) => {
+const createReview = async (req, res) => {
   try {
     const newReview = await Review.create(req.body);
     res.status(201).json({ success: true, data: newReview });
@@ -38,7 +39,7 @@ exports.createReview = async (req, res) => {
 };
 
 // UPDATE a review
-exports.updateReview = async (req, res) => {
+const updateReview = async (req, res) => {
   try {
     const updatedReview = await Review.findByIdAndUpdate(
       req.params.id,
@@ -57,7 +58,7 @@ exports.updateReview = async (req, res) => {
 };
 
 // DELETE a review
-exports.deleteReview = async (req, res) => {
+const deleteReview = async (req, res) => {
   try {
     const deleted = await Review.findByIdAndDelete(req.params.id);
 
@@ -69,4 +70,12 @@ exports.deleteReview = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+};
+
+export {
+  getAllReviews,
+  getReviewById,
+  createReview,
+  updateReview,
+  deleteReview
 };
