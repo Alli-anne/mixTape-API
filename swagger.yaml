@@ -54,6 +54,52 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
+    
+  /songs/search/spotify:
+    get:
+      summary: Search Spotify for songs
+      description: Searches Spotify API for tracks using a search query.
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+          description: Search term (song title, artist, album, etc.)
+      responses:
+        '200':
+          description: Spotify search results
+        '400':
+          description: Query parameter missing
+        '500':
+          description: Internal Server Error
+
+  /songs/spotify/{id}:
+  get:
+    summary: Get a Spotify track by ID
+    description: Fetches a song directly from the Spotify API using its Spotify Track ID.
+    tags:
+      - Spotify
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: The Spotify track ID
+    responses:
+      '200':
+        description: Spotify track data
+        content:
+          application/json:
+            schema:
+              type: object
+      '400':
+        description: ID parameter is required
+      '404':
+        description: Spotify track not found
+      '500':
+        description: Internal Server Error  
   
   /songs/{id}:
     get:
