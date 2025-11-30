@@ -6,7 +6,9 @@ info:
 
 servers:
   - url: https://mixtape-api-63j6.onrender.com
+    description: production
   - url: http://localhost:3000
+    description: local development
 
 paths:
   /users/:
@@ -15,6 +17,21 @@ paths:
       responses:
         '200':
           description: List of all users
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
         '500':
           description: Internal Server Error
 
@@ -120,3 +137,13 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string

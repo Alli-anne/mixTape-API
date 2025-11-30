@@ -1,48 +1,24 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
-import { initDb, getDb } from './database/connect.js';
 import routes from './routes/index.js';
-import pkg from 'express-openid-connect';
-const { auth } = pkg;
+import databaseConnection from './models/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: process.env.SECRET,
-  baseURL: process.env.BASE_URL,
-  clientID: process.env.CLIENT_ID,
-  issuerBaseURL: process.env.ISSUER_BASE_URL,
-};
-
-// auth router attaches /login, /logout, and /callback routes to the baseURL
-app.use(auth(config));
-
-const requiresAuth = (req, res, next) => {
-  if (!req.oidc.isAuthenticated()) {
-    return res.oidc.login({ returnTo: req.originalUrl });
-  }
-  next();
-}
-
-
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
-
-
+app.use(express.json());
 app.use('/', routes);
 
-
-initDb()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Connected to DB and listening on http://127.0.0.1:${PORT}`);
+const db = databaseConnection;
+db.mongoose
+    .connect(db.url, {})
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Connected to DB and running on http://localhost:${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.log('Could not connect to the DB!', err);
+        process.exit();
     });
-  })
-  .catch((err) => {
-    console.error("Failed to connect to DB", err);
-  });
