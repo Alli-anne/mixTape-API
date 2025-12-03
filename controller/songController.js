@@ -94,7 +94,6 @@ const searchSpotifyController = asyncHandler(async (req, res) => {
 
 export {
   getAllSongs,
-  getSongById,
   createSong,
   updateSong,
   deleteSong,
