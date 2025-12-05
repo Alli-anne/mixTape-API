@@ -15,5 +15,13 @@ const config = {
 
 const authMiddleware = auth(config);
 
-export {authMiddleware, requiresAuth, config};
+const requiresAuthRedirect = (req, res, next) => {
+  if (!req.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+};
+
+export {authMiddleware, requiresAuth, requiresAuthRedirect, config};
 export default authMiddleware;
