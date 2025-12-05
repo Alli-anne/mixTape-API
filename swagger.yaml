@@ -124,6 +124,13 @@ paths:
           description: Internal Server Error
 
   /songs/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: The song ID
     get:
       summary: Get song by ID
       responses:
@@ -160,41 +167,14 @@ paths:
         '500':
           description: Internal Server Error
 
-  /reviews/:
-    get:
-      summary: Get reviews
-      responses:
-        '200':
-          description: List of reviews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Review'
-        '401':
-          description: Unauthorized – Please sign in
-        '500':
-          description: Internal Server Error
-    post:
-      summary: Create a new review
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Review'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '401':
-          description: Unauthorized – Please sign in
-        '500':
-          description: Internal Server Error
-
   /reviews/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: The review ID
     get:
       summary: Get review by ID
       responses:
@@ -230,6 +210,40 @@ paths:
       responses:
         '204':
           description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
+
+  /reviews/:
+    get:
+      summary: Get reviews
+      responses:
+        '200':
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a new review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Created
         '400':
           description: Bad Request
         '401':
@@ -293,4 +307,5 @@ components:
         comment:
           type: string
           example: Amazing track!
+
 
