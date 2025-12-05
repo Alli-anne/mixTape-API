@@ -8,10 +8,12 @@ import {
   searchSpotifyController,
   getBySpotifyId
 } from '../controller/songController.js';
+import { requiresAuth } from '../middleware/auth.js';
+
 
 const router = express.Router();
 // Spotify search
-router.get('/search/spotify', searchSpotifyController);
+router.get('/search/spotify', requiresAuth(),searchSpotifyController);
 
 // Get song by Spotify ID
 router.get('/spotify/:id', getBySpotifyId);
