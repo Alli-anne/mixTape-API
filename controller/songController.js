@@ -1,113 +1,102 @@
 // controller/songController.js
 
 import db from '../models/index.js';
-import {searchSongs, getSongById} from '../spotify.service.js';
+import { searchSongs, getSongById as fetchSongBySpotifyId } from '../spotify.service.js';
+
 const Song = db.song;
 
+/**
+ * Async handler to wrap async routes and forward errors
+ */
+const asyncHandler = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
 
-
-// GET all songs
-const getAllSongs = async (req, res) => {
-  try {
-    const songs = await Song.find();
-    res.status(200).json({ success: true, data: songs });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+/**
+ * Standard response helper
+ */
+const sendResponse = (res, status, success, dataOrMessage, isError = false) => {
+  if (isError) {
+    res.status(status).json({ success, message: dataOrMessage });
+  } else {
+    res.status(status).json({ success, data: dataOrMessage });
   }
 };
 
-// GET a single song by ID
-// const getSongById = async (req, res) => {
-//   try {
-//     const song = await Song.findById(req.params.id);
+/**
+ * GET all songs
+ */
+const getAllSongs = asyncHandler(async (req, res) => {
+  const songs = await Song.find();
+  sendResponse(res, 200, true, songs);
+});
 
-//     if (!song) {
-//       return res.status(404).json({ success: false, message: 'Song not found' });
-//     }
+/**
+ * GET single song by local DB ID
+ */
+//const getSongById = asyncHandler(async (req, res) => {
+  //const song = await Song.findById(req.params.id);
+  //if (!song) return sendResponse(res, 404, false, 'Song not found', true);
+  //sendResponse(res, 200, true, song);
+//});
 
-//     res.status(200).json({ success: true, data: song });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
+/**
+ * CREATE a song
+ */
+const createSong = asyncHandler(async (req, res) => {
+  const newSong = await Song.create(req.body);
+  sendResponse(res, 201, true, newSong);
+});
 
-// CREATE a song
-const createSong = async (req, res) => {
-  try {
-    const newSong = await Song.create(req.body);
-    res.status(201).json({ success: true, data: newSong });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
+/**
+ * UPDATE a song
+ */
+const updateSong = asyncHandler(async (req, res) => {
+  const updatedSong = await Song.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-// UPDATE a song
-const updateSong = async (req, res) => {
-  try {
-    const updatedSong = await Song.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+  if (!updatedSong) return sendResponse(res, 404, false, 'Song not found', true);
+  sendResponse(res, 200, true, updatedSong);
+});
 
-    if (!updatedSong) {
-      return res.status(404).json({ success: false, message: 'Song not found' });
-    }
+/**
+ * DELETE a song
+ */
+const deleteSong = asyncHandler(async (req, res) => {
+  const deletedSong = await Song.findByIdAndDelete(req.params.id);
+  if (!deletedSong) return sendResponse(res, 404, false, 'Song not found', true);
+  sendResponse(res, 200, true, 'Song deleted');
+});
 
-    res.status(200).json({ success: true, data: updatedSong });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
-};
-
-// DELETE a song
-const deleteSong = async (req, res) => {
-  try {
-    const deleted = await Song.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ success: false, message: 'Song not found' });
-    }
-
-    res.status(200).json({ success: true, message: 'Song deleted' });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const getBySpotifyId = async (req, res) => {
- try{
+/**
+ * GET song from Spotify by Spotify ID
+ */
+const getBySpotifyId = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  if (!id) return res.status(400).json({ message: 'ID is required' });
+  if (!id) return sendResponse(res, 400, false, 'Spotify ID is required', true);
 
-  const song = await getSongById(id); // function from spotify.service.js
-  res.status(200).json(song);
- } catch (error) {
-  console.error('Error searching Spotify:', error);
-  res.status(500).json({ message: 'Internal Server Error' });
- }
-};
+  const song = await fetchSongBySpotifyId(id);
+  sendResponse(res, 200, true, song);
+});
 
-const searchSpotifyController = async (req, res) => {
-  try {
-    const { query } = req.query;
-    if (!query) return res.status(400).json({ message: 'Query is required' });
+/**
+ * SEARCH songs on Spotify
+ */
+const searchSpotifyController = asyncHandler(async (req, res) => {
+  const { query } = req.query;
+  if (!query) return sendResponse(res, 400, false, 'Query is required', true);
 
-    const results = await searchSongs(query); // function from spotify.service.js
-    res.status(200).json(results);
-  } catch (error) {
-    console.error('Error searching Spotify:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
+  const results = await searchSongs(query);
+  sendResponse(res, 200, true, results);
+});
 
 export {
   getAllSongs,
-  getSongById,
   createSong,
   updateSong,
   deleteSong,
+  getBySpotifyId,
   searchSpotifyController,
-  getBySpotifyId
-}
+};

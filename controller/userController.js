@@ -1,50 +1,48 @@
+// controller/userController.js
+
 import db from '../models/index.js';
 const User = db.user;
 
-const createUser = async (req, res) => {
-  try {
-    console.log(req.body)
-    const {username, password} = req.body;
+/**
+ * Async handler to catch errors
+ */
+const asyncHandler = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
 
-    const user = new User({
-      username: username,
-      password: password
-    });
-
-    user.save()
-    .then((data) => {
-      console.log(data)
-      res.status(201).send(data)
-    })
-    .catch((err) => {
-            res.status(500).send({
-                message: err.message
-            })
-        })
-  } catch (err) {
-    res.status(500).send({
-            message: err.message
-    })
-  }
-}
-
-const getAllUsers = async (req, res) => {
-  try {
-    User.find()
-    .then((users) => {
-      res.status(200).send(users);
-    })
-    .catch((err) => {
-        res.status(500).send({
-          message: err.message
-        })
-    })
-  }
-  catch (err) {
-    res.status(500).send({
-      message: err.message
-    });
+/**
+ * Standard response helper
+ */
+const sendResponse = (res, status, success, dataOrMessage, isError = false) => {
+  if (isError) {
+    res.status(status).json({ success, message: dataOrMessage });
+  } else {
+    res.status(status).json({ success, data: dataOrMessage });
   }
 };
 
-export {createUser, getAllUsers}
+/**
+ * CREATE a new user
+ */
+const createUser = asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return sendResponse(res, 400, false, 'Username and password are required', true);
+  }
+
+  const user = new User({ username, password });
+  const savedUser = await user.save();
+
+  sendResponse(res, 201, true, savedUser);
+});
+
+/**
+ * GET all users
+ */
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find();
+  sendResponse(res, 200, true, users);
+});
+
+export { createUser, getAllUsers };
