@@ -18,14 +18,14 @@ router.get('/search/spotify', requiresAuth(),searchSpotifyController);
 
 
 // Get song by Spotify ID
-router.get('/spotify/:id', getBySpotifyId);
+router.get('/spotify/:id', requiresAuth(), getBySpotifyId);
 
 // Local DB routes
-router.get('/', getAllSongs);
+router.get('/', requiresAuth(), getAllSongs);
 // router.get('/:id', getSongById);
-router.post('/', createSong);
-router.put('/:id', updateSong);
-router.delete('/:id', deleteSong);
+router.post('/', requiresAuth(), createSong);
+router.put('/:id', requiresAuth(), updateSong);
+router.delete('/:id', requiresAuth(), deleteSong);
 
 
 
