@@ -17,6 +17,12 @@ paths:
       responses:
         '200':
           description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
         '500':
           description: Internal Server Error
     post:
@@ -41,12 +47,22 @@ paths:
       responses:
         '200':
           description: List of songs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
         '500':
           description: Internal Server Error
     post:
       summary: Create a new song
       requestBody:
         required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Song'
       responses:
         '201':
           description: Created
@@ -54,7 +70,7 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
-    
+
   /songs/search/spotify:
     get:
       summary: Search Spotify for songs
@@ -69,51 +85,64 @@ paths:
       responses:
         '200':
           description: Spotify search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
         '400':
           description: Query parameter missing
         '500':
           description: Internal Server Error
 
   /songs/spotify/{id}:
-  get:
-    summary: Get a Spotify track by ID
-    description: Fetches a song directly from the Spotify API using its Spotify Track ID.
-    tags:
-      - Spotify
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        description: The Spotify track ID
-    responses:
-      '200':
-        description: Spotify track data
-        content:
-          application/json:
-            schema:
-              type: object
-      '400':
-        description: ID parameter is required
-      '404':
-        description: Spotify track not found
-      '500':
-        description: Internal Server Error  
-  
+    get:
+      summary: Get a Spotify track by ID
+      description: Fetches a song directly from the Spotify API using its Spotify Track ID.
+      tags:
+        - Spotify
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The Spotify track ID
+      responses:
+        '200':
+          description: Spotify track data
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: ID parameter is required
+        '404':
+          description: Spotify track not found
+        '500':
+          description: Internal Server Error
+
   /songs/{id}:
     get:
       summary: Get song by ID
       responses:
         '200':
-          description: song information
+          description: Song information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Song'
         '500':
           description: Internal Server Error
-    
     put:
       summary: Update song
       requestBody:
         required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Song'
       responses:
         '204':
           description: No Content
@@ -121,85 +150,147 @@ paths:
           description: Bad Request
         '500':
           description: Internal Server Error
-      
     delete:
-      summary: Delete Song
+      summary: Delete song
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
         '400':
           description: Bad Request
         '500':
           description: Internal Server Error
-  
 
-/reviews/:
-  get:
-    summary: Get reviews
-    responses:
-      '200': 
-        description: List of reviews
-      '401':
-        description: Unauthorized – Please sign in
-      '500':
-        description: Internal Server Error
-  post:
-    summary: Create a new review
-    requestBody:
-      required: true
-    responses:
-      '201':
-        description: Created
-      '400':
-        description: Bad Request
-      '401':
-        description: Unauthorized – Please sign in
-      '500':
-        description: Internal Server Error
+  /reviews/:
+    get:
+      summary: Get reviews
+      responses:
+        '200':
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a new review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
 
-/reviews/{id}:
-  get:
-    summary: Get review by ID
-    responses:
-      '200': 
-        description: Review information
-      '401':
-        description: Unauthorized – Please sign in
-      '500':
-        description: Internal Server Error
-
-  put:
-    summary: Update review
-    requestBody:
-      required: true
-    responses:
-      '204':
-        description: No Content
-      '400':
-        description: Bad Request
-      '401':
-        description: Unauthorized – Please sign in
-      '500':
-        description: Internal Server Error
-
-  delete:
-    summary: Delete review
-    responses:
-      '200':
-        description: OK
-      '400':
-        description: Bad Request
-      '401':
-        description: Unauthorized – Please sign in
-      '500':
-        description: Internal Server Error
+  /reviews/{id}:
+    get:
+      summary: Get review by ID
+      responses:
+        '200':
+          description: Review information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
+    delete:
+      summary: Delete review
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
 
 components:
   schemas:
     User:
       type: object
+      required:
+        - username
+        - password
       properties:
         username:
           type: string
+          example: johndoe
         password:
           type: string
+          example: mysecretpassword
+
+    Song:
+      type: object
+      required:
+        - title
+        - artist
+      properties:
+        title:
+          type: string
+          example: Blinding Lights
+        artist:
+          type: string
+          example: The Weeknd
+        album:
+          type: string
+          example: After Hours
+        releaseDate:
+          type: string
+          format: date
+          example: 2020-03-20
+
+    Review:
+      type: object
+      required:
+        - songId
+        - userId
+        - rating
+      properties:
+        songId:
+          type: string
+          example: 123
+        userId:
+          type: string
+          example: 456
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        comment:
+          type: string
+          example: Amazing track!
+
