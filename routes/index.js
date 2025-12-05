@@ -22,4 +22,7 @@ router.use('/songs', songRoute);
 import reviewRoute from './reviewRoute.js';
 router.use('/reviews', reviewRoute);
 
+import loginRoute from './loginRoute.js';
+router.use('/login', loginRoute);
+
 export default router;
