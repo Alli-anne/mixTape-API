@@ -25,4 +25,7 @@ router.use('/reviews', reviewRoute);
 import loginRoute from './loginRoute.js';
 router.use('/login', loginRoute);
 
+import dailyRoute from './dailyRoute.js';
+router.use('/dailySong', dailyRoute);
+
 export default router;
