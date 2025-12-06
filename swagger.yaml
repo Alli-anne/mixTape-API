@@ -250,7 +250,37 @@ paths:
           description: Unauthorized – Please sign in
         '500':
           description: Internal Server Error
-
+  /dailySong/:
+    get:
+      summary: Get daily song
+      responses:
+        '200':
+          description: Daily song information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Daily'
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
+    post:
+      summary: Create a new daily song
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Daily'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized – Please sign in
+        '500':
+          description: Internal Server Error
 components:
   schemas:
     User:
@@ -307,6 +337,18 @@ components:
         comment:
           type: string
           example: Amazing track!
-
+    Daily:
+      type: object
+      required:
+        - songId
+        - userId
+      properties:
+        songId:
+          type: string
+          example: 123
+        userId:
+          type: string
+          example: 456
+    
 
 

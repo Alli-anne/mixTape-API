@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import song from './song.js';
 import user from './user.js';
 import review from './review.js';
+import daily from './daily.js';
 mongoose.Promise = global.Promise;
 
 const db = {};
@@ -11,5 +12,6 @@ db.url = config.url;
 db.user = user;
 db.song = song;
 db.review = review;
+db.daily = daily;
 
 export default db;
