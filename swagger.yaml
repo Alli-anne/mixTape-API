@@ -250,7 +250,7 @@ paths:
           description: Unauthorized – Please sign in
         '500':
           description: Internal Server Error
-  /dailySong/:
+  /dailySong/all:
     get:
       summary: Get daily song
       responses:
@@ -264,6 +264,7 @@ paths:
           description: Unauthorized – Please sign in
         '500':
           description: Internal Server Error
+  /dailySong/create:
     post:
       summary: Create a new daily song
       requestBody:
