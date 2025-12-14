@@ -25,77 +25,6 @@ paths:
                   $ref: '#/components/schemas/User'
         '500':
           description: Internal Server Error
-    post:
-      summary: Create a new user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-
-  /songs/:
-    get:
-      summary: Get songs
-      responses:
-        '200':
-          description: List of songs
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Song'
-        '500':
-          description: Internal Server Error
-    post:
-      summary: Create a new song
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Song'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-
-  /songs/search/spotify:
-    get:
-      summary: Search Spotify for songs
-      description: Searches Spotify API for tracks using a search query.
-      parameters:
-        - in: query
-          name: query
-          required: true
-          schema:
-            type: string
-          description: Search term (song title, artist, album, etc.)
-      responses:
-        '200':
-          description: Spotify search results
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-        '400':
-          description: Query parameter missing
-        '500':
-          description: Internal Server Error
-
   /songs/spotify/{id}:
     get:
       summary: Get a Spotify track by ID
@@ -122,51 +51,6 @@ paths:
           description: Spotify track not found
         '500':
           description: Internal Server Error
-
-  /songs/{id}:
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        description: The song ID
-    get:
-      summary: Get song by ID
-      responses:
-        '200':
-          description: Song information
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Song'
-        '500':
-          description: Internal Server Error
-    put:
-      summary: Update song
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Song'
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-    delete:
-      summary: Delete song
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-
   /reviews/{id}:
     parameters:
       - in: path
@@ -350,6 +234,4 @@ components:
         userId:
           type: string
           example: 456
-    
-
 

@@ -24,18 +24,18 @@ const sendResponse = (res, status, success, dataOrMessage, isError = false) => {
 /**
  * CREATE a new user
  */
-const createUser = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+// const createUser = asyncHandler(async (req, res) => {
+//   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return sendResponse(res, 400, false, 'Username and password are required', true);
-  }
+//   if (!username || !password) {
+//     return sendResponse(res, 400, false, 'Username and password are required', true);
+//   }
 
-  const user = new User({ username, password });
-  const savedUser = await user.save();
+//   const user = new User({ username, password });
+//   const savedUser = await user.save();
 
-  sendResponse(res, 201, true, savedUser);
-});
+//   sendResponse(res, 201, true, savedUser);
+// });
 
 /**
  * GET all users
@@ -45,4 +45,6 @@ const getAllUsers = asyncHandler(async (req, res) => {
   sendResponse(res, 200, true, users);
 });
 
-export { createUser, getAllUsers };
+export { 
+  // createUser, 
+  getAllUsers };
