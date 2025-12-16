@@ -1,7 +1,7 @@
 // controller/reviewController.js
 
 import db from '../models/index.js';
-import fetchSpotifyTrack from '../spotify.service.js';
+import { getSongById } from '../spotify.service.js';
 const Review = db.review;
 
 /**
@@ -37,6 +37,8 @@ const getReviewById = asyncHandler(async (req, res) => {
 
 // CREATE a review
 const createReview = asyncHandler(async (req, res) => {
+  const track = await getSongById(spotifyId);
+
   const { songId: spotifyId, rating, comment, hashtags } = req.body;
 
   let song = await Song.findOne({ spotifyId });
