@@ -31,5 +31,10 @@ const createDaily = asyncHandler(async (req, res) => {
   sendResponse(res, 201, true, newDaily);
 });
 
+const deleteDaily = asyncHandler(async (req, res) => {
+  const deletedDaily = await Daily.findByIdAndDelete(req.params.id);
+  if (!deletedDaily) return sendResponse(res, 404, false, 'Daily not found', true);
+  sendResponse(res, 200, true, deletedDaily);
+});
 
 export { getAllDaily, createDaily };

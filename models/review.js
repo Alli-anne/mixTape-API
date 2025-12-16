@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 const reviewSchema = new mongoose.Schema({
     songId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Song',
         required: true
     },
     userId: {
@@ -19,6 +18,10 @@ const reviewSchema = new mongoose.Schema({
     },
     comment: {
         type: String
+    },
+    hashtags: {
+        type: String,
+        required: false
     },
     createdAt: {
         type: Date,
