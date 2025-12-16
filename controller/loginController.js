@@ -4,13 +4,13 @@ const login = (req, res) => {
 
 const afterLogin = (req, res) => {
   // req.user is available here
-  res.redirect('/');
+  res.redirect('/users');
 };
 
 const logout = (req, res) => {
    req.logout(function(err) {
      if (err) { return next(err); }
-     res.redirect('/users');
+     res.redirect('/logout');
    });
 };
 
