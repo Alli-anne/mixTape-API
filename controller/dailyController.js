@@ -37,4 +37,4 @@ const deleteDaily = asyncHandler(async (req, res) => {
   sendResponse(res, 200, true, deletedDaily);
 });
 
-export { getAllDaily, createDaily };
+export { getAllDaily, createDaily, deleteDaily };
