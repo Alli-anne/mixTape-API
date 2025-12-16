@@ -93,10 +93,10 @@ const searchSpotifyController = asyncHandler(async (req, res) => {
 });
 
 export {
-  // getAllSongs,
-  // createSong,
-  // updateSong,
-  // deleteSong,
+  getAllSongs,
+  createSong,
+  updateSong,
+  deleteSong,
   getBySpotifyId,
   searchSpotifyController,
 };

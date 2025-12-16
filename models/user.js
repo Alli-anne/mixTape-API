@@ -5,10 +5,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    password: {
-        type: String,
-        required: false
-    },
+    // password: {
+    //     type: String,
+    //     required: false
+    // },
 
     // --- OAuth Fields ---
     googleId: {
