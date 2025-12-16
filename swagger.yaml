@@ -25,6 +25,32 @@ paths:
                   $ref: '#/components/schemas/User'
         '500':
           description: Internal Server Error
+  
+  /songs/search/spotify:
+    get:
+      summary: Search Spotify for songs
+      description: Searches Spotify API for tracks using a search query.
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+          description: Search term (song title, artist, album, etc.)
+      responses:
+        '200':
+          description: Spotify search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          description: Query parameter missing
+        '500':
+          description: Internal Server Error
+
   /songs/spotify/{id}:
     get:
       summary: Get a Spotify track by ID
