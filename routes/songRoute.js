@@ -1,9 +1,9 @@
 import express from 'express';
 import {
-  // getAllSongs,
-  // createSong,
-  // updateSong,
-  // deleteSong,
+  getAllSongs,
+  createSong,
+  updateSong,
+  deleteSong,
   searchSpotifyController,
   getBySpotifyId
 } from '../controller/songController.js';
@@ -18,9 +18,9 @@ router.get('/search/spotify', requiresAuth(), searchSpotifyController);
 router.get('/spotify/:id', requiresAuth(), getBySpotifyId);
 
 // // Local DB routes
-// router.get('/', requiresAuth(), getAllSongs);
-// router.post('/', requiresAuth(), createSong);
-// router.put('/:id', requiresAuth(), updateSong);
-// router.delete('/:id', requiresAuth(), deleteSong);
+router.get('/', requiresAuth(), getAllSongs);
+router.post('/', requiresAuth(), createSong);
+router.put('/:id', requiresAuth(), updateSong);
+router.delete('/:id', requiresAuth(), deleteSong);
 
 export default router;

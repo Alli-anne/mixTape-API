@@ -9,6 +9,10 @@ import { authMiddleware, requiresAuth } from '../middleware/auth.js';
 
 router.use(authMiddleware);
 
+router.get('/', (req, res) => {
+    res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
+})
+
 // Swagger docs
 router.use('/api-docs', swaggerUi.serve);
 router.use('/api-docs', swaggerUi.setup(swaggerDocument));
@@ -28,9 +32,5 @@ router.use('/login', loginRoute);
 
 import dailyRoute from './dailyRoute.js';
 router.use('/dailySong', dailyRoute);
-
-// --- ADD GOOGLE OAUTH ROUTES ---
-import authRoutes from './auth.js';
-router.use('/auth', authRoutes); // <-- now /auth/google and /auth/google/callback work
 
 export default router;
