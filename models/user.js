@@ -11,11 +11,11 @@ const userSchema = new mongoose.Schema({
     // },
 
     // --- OAuth Fields ---
-    googleId: {
+    auth0Id: {
         type: String,
-        required: false,
+        required: true,
         unique: true,
-        sparse: true
+        index: true
     },
     email: {
         type: String,
