@@ -1,7 +1,7 @@
 // controller/reviewController.js
 
 import db from '../models/index.js';
-import { getSongById } from '../spotify.service.js';
+import fetchSpotifyTrack from '../utils/spotify.js';
 const Review = db.review;
 
 /**
@@ -37,54 +37,8 @@ const getReviewById = asyncHandler(async (req, res) => {
 
 // CREATE a review
 const createReview = asyncHandler(async (req, res) => {
-  const { songId: spotifyId, rating, comment, hashtags } = req.body;
-
-  if (!spotifyId) {
-    return res.status(400).json({ success: false, message: 'Spotify songId is required' });
-  }
-
-  // 1️⃣ Find the song in DB
-  let song = await Song.findOne({ spotifyId });
-
-  // 2️⃣ If not found, fetch from Spotify API
-  if (!song) {
-    const track = await getSongById(spotifyId);
-    if (!track) {
-      return res.status(404).json({ success: false, message: 'Song not found in Spotify' });
-    }
-
-    // Save trimmed song data to DB
-    song = await Song.create({
-      spotifyId: track.id,
-      title: track.name,
-      artists: track.artists.map(a => a.name),
-      album: track.album.name,
-      releaseDate: track.album.release_date,
-      durationMs: track.duration_ms,
-      previewUrl: track.preview_url,
-      imageUrl: track.album.images[0]?.url
-    });
-  }
-
-  // 3️⃣ Optional: prevent duplicate review by the same user
-  const existingReview = await Review.findOne({
-    songId: song._id,
-    userId: req.user._id
-  });
-  if (existingReview) {
-    return res.status(400).json({ success: false, message: 'You have already reviewed this song' });
-  }
-
-  // 4️⃣ Create the review using Mongo ObjectId
-  const newReview = await Review.create({
-    songId: song._id,
-    userId: req.user._id,
-    rating,
-    comment,
-    hashtags // make sure hashtags is an array if your schema expects it
-  });
-
-  return res.status(201).json({ success: true, data: newReview });
+  const newReview = await Review.create(req.body);
+  sendResponse(res, 201, true, newReview);
 });
 
 // UPDATE a review
