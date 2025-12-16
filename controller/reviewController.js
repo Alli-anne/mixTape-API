@@ -1,6 +1,7 @@
 // controller/reviewController.js
 
 import db from '../models/index.js';
+import fetchSpotifyTrack from '../utils/spotify.js';
 const Review = db.review;
 
 /**
@@ -36,7 +37,35 @@ const getReviewById = asyncHandler(async (req, res) => {
 
 // CREATE a review
 const createReview = asyncHandler(async (req, res) => {
-  const newReview = await Review.create(req.body);
+  const { songId: spotifyId, rating, comment, hashtags } = req.body;
+
+  let song = await Song.findOne({ spotifyId });
+  if (!song) {
+    
+    const track = await fetchSpotifyTrack(spotifyId); 
+    if (!track) return sendResponse(res, 404, false, 'Song not found in Spotify', true);
+
+    song = await Song.create({
+      spotifyId: track.id,
+      title: track.name,
+      artists: track.artists.map(a => a.name),
+      album: track.album.name,
+      releaseDate: track.album.release_date,
+      durationMs: track.duration_ms,
+      previewUrl: track.preview_url,
+      imageUrl: track.album.images[0]?.url
+    });
+  }
+
+
+  const newReview = await Review.create({
+    songId: song._id,
+    userId: req.user._id, 
+    rating,
+    comment,
+    hashtags
+  });
+
   sendResponse(res, 201, true, newReview);
 });
 
