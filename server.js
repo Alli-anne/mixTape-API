@@ -9,6 +9,8 @@ import session from 'express-session';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ensureUser is applied after the auth middleware in `routes/index.js`
+
 // Body parser
 app.use(express.json());
 

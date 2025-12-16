@@ -6,8 +6,10 @@ import swaggerUi from 'swagger-ui-express';
 const swaggerDocument = YAML.load('./swagger.yaml');
 
 import { authMiddleware, requiresAuth } from '../middleware/auth.js';
+import { ensureUser } from '../controller/ensureUser.js';
 
 router.use(authMiddleware);
+router.use(ensureUser);
 
 router.get('/', (req, res) => {
     res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
