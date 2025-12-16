@@ -6,10 +6,6 @@ const ensureUser = async (req, res, next) => {
         return next();
     }
 
-    if (!req.oidc.isAuthenticated()) {
-        return next();
-    }
-
     const {sub, email, name, photo} = req.oidc.user || {};
 
     if (!sub) {
