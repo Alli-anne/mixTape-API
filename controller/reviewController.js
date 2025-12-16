@@ -37,16 +37,23 @@ const getReviewById = asyncHandler(async (req, res) => {
 
 // CREATE a review
 const createReview = asyncHandler(async (req, res) => {
-  const track = await getSongById(spotifyId);
-
   const { songId: spotifyId, rating, comment, hashtags } = req.body;
 
-  let song = await Song.findOne({ spotifyId });
-  if (!song) {
-    
-    const track = await fetchSpotifyTrack(spotifyId); 
-    if (!track) return sendResponse(res, 404, false, 'Song not found in Spotify', true);
+  if (!spotifyId) {
+    return res.status(400).json({ success: false, message: 'Spotify songId is required' });
+  }
 
+  // 1️⃣ Find the song in DB
+  let song = await Song.findOne({ spotifyId });
+
+  // 2️⃣ If not found, fetch from Spotify API
+  if (!song) {
+    const track = await getSongById(spotifyId);
+    if (!track) {
+      return res.status(404).json({ success: false, message: 'Song not found in Spotify' });
+    }
+
+    // Save trimmed song data to DB
     song = await Song.create({
       spotifyId: track.id,
       title: track.name,
@@ -59,16 +66,25 @@ const createReview = asyncHandler(async (req, res) => {
     });
   }
 
+  // 3️⃣ Optional: prevent duplicate review by the same user
+  const existingReview = await Review.findOne({
+    songId: song._id,
+    userId: req.user._id
+  });
+  if (existingReview) {
+    return res.status(400).json({ success: false, message: 'You have already reviewed this song' });
+  }
 
+  // 4️⃣ Create the review using Mongo ObjectId
   const newReview = await Review.create({
     songId: song._id,
-    userId: req.user._id, 
+    userId: req.user._id,
     rating,
     comment,
-    hashtags
+    hashtags // make sure hashtags is an array if your schema expects it
   });
 
-  sendResponse(res, 201, true, newReview);
+  return res.status(201).json({ success: true, data: newReview });
 });
 
 // UPDATE a review
