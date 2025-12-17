@@ -1,5 +1,5 @@
 import db from '../models/index.js';
-const Daily = db.review;
+const Daily = db.daily;
 
 
 /**
