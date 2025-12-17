@@ -5,7 +5,7 @@ const createDailyValidators = [
     .exists({ checkFalsy: true }).withMessage('user is required')
     .isMongoId().withMessage('user must be a valid Mongo ID'),
 
-  body('spotifyId')
+  body('song')
     .exists({ checkFalsy: true }).withMessage('spotifyId is required')
     .isString().withMessage('spotifyId must be a string')
 ];
