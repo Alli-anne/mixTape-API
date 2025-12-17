@@ -24,7 +24,7 @@ const updateReviewValidators = [
 
   body('songId')
     .optional()
-    .isMongoId().withMessage('songId must be a valid Mongo ID'),
+    .isString().withMessage('songId must be a Spotify ID string'),  // Changed
 
   body('userId')
     .optional()
