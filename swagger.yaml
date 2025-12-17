@@ -1,41 +1,231 @@
 openapi: 3.0.3
 info:
   title: MixTape API
-  description: API documentation for MixTape
+  description: API documentation for MixTape - A music review platform
   version: 1.0.0
 
 servers:
   - url: https://mixtape-api-63j6.onrender.com
-    description: production
+    description: Production server
   - url: http://localhost:3000
-    description: local development
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: Login and logout operations
+  - name: Users
+    description: User management endpoints
+  - name: Songs
+    description: Song management and Spotify integration
+  - name: Reviews
+    description: Song review operations
+  - name: Daily Song
+    description: Daily song of the day feature
 
 paths:
+  # ==================== AUTHENTICATION ====================
+  /login/login:
+    get:
+      summary: Redirect to login page
+      tags:
+        - Authentication
+      responses:
+        '302':
+          description: Redirect to Auth0 login
+        '500':
+          description: Internal Server Error
+
+  /login/afterLogin:
+    get:
+      summary: Callback after successful login
+      tags:
+        - Authentication
+      responses:
+        '302':
+          description: Redirect to users page
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+
+  /login/logout:
+    get:
+      summary: Logout current user
+      tags:
+        - Authentication
+      responses:
+        '302':
+          description: Redirect to logout page
+        '500':
+          description: Internal Server Error
+
+  # ==================== USERS ====================
   /users/:
     get:
       summary: Get all users
+      tags:
+        - Users
       responses:
         '200':
           description: List of all users
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - Please sign in
         '500':
           description: Internal Server Error
-  
+
+  # ==================== SONGS ====================
+  /songs/:
+    get:
+      summary: Get all songs from database
+      tags:
+        - Songs
+      responses:
+        '200':
+          description: List of all songs in database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Song'
+        '401':
+          description: Unauthorized - Please sign in
+        '500':
+          description: Internal Server Error
+    
+    post:
+      summary: Create a new song in database
+      tags:
+        - Songs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongCreate'
+      responses:
+        '201':
+          description: Song created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Song'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized - Please sign in
+        '500':
+          description: Internal Server Error
+
+  /songs/{id}:
+    put:
+      summary: Update a song
+      tags:
+        - Songs
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the song
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SongCreate'
+      responses:
+        '200':
+          description: Song updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Song'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized - Please sign in
+        '404':
+          description: Song not found
+        '500':
+          description: Internal Server Error
+    
+    delete:
+      summary: Delete a song
+      tags:
+        - Songs
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the song
+      responses:
+        '200':
+          description: Song deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: string
+                    example: Song deleted
+        '401':
+          description: Unauthorized - Please sign in
+        '404':
+          description: Song not found
+        '500':
+          description: Internal Server Error
+
   /songs/search/spotify:
     get:
       summary: Search Spotify for songs
-      description: Searches Spotify API for tracks using a search query.
+      description: Search for songs on Spotify using a query string
+      tags:
+        - Songs
       parameters:
         - in: query
           name: query
           required: true
           schema:
             type: string
+            example: Blinding Lights
           description: Search term (song title, artist, album, etc.)
       responses:
         '200':
@@ -43,42 +233,57 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0VjIjW4GlUZAMYd2vXMi3b
+                        name:
+                          type: string
+                          example: Blinding Lights
+                        artists:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                                example: The Weeknd
+                        album:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: After Hours
         '400':
           description: Query parameter missing
+        '401':
+          description: Unauthorized - Please sign in
         '500':
           description: Internal Server Error
-  /songs/add/spotify:
-    post:
-      summary: Add a song to the database
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Song'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error  
+
   /songs/spotify/{id}:
     get:
-      summary: Get a Spotify track by ID
-      description: Fetches a song directly from the Spotify API using its Spotify Track ID.
+      summary: Get a song from Spotify by ID
+      description: Fetch song details directly from Spotify API using Spotify Track ID
       tags:
-        - Spotify
+        - Songs
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: The Spotify track ID
+            example: 0VjIjW4GlUZAMYd2vXMi3b
+          description: Spotify track ID
       responses:
         '200':
           description: Spotify track data
@@ -86,158 +291,399 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
         '400':
-          description: ID parameter is required
+          description: Spotify ID is required
+        '401':
+          description: Unauthorized - Please sign in
         '404':
           description: Spotify track not found
         '500':
           description: Internal Server Error
-  /reviews/{id}:
-    parameters:
-      - in: path
-        name: id
+
+  /songs/add/spotify:
+    post:
+      summary: Add a song from Spotify to database
+      description: Fetch a song from Spotify and save it to the database
+      tags:
+        - Songs
+      requestBody:
         required: true
-        schema:
-          type: string
-        description: The review ID
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - spotifyId
+              properties:
+                spotifyId:
+                  type: string
+                  example: 0VjIjW4GlUZAMYd2vXMi3b
+                  description: Spotify track ID
+      responses:
+        '201':
+          description: Song added to database successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Song'
+        '200':
+          description: Song already exists in database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Song'
+        '400':
+          description: Spotify ID is required
+        '401':
+          description: Unauthorized - Please sign in
+        '404':
+          description: Song not found on Spotify
+        '500':
+          description: Internal Server Error
+
+  # ==================== REVIEWS ====================
+  /reviews/:
+    get:
+      summary: Get all reviews
+      tags:
+        - Reviews
+      responses:
+        '200':
+          description: List of all reviews
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+        '401':
+          description: Unauthorized - Please sign in
+        '500':
+          description: Internal Server Error
+    
+    post:
+      summary: Create a new review
+      description: Create a review for a song. If the song doesn't exist in the database, it will be fetched from Spotify and added automatically.
+      tags:
+        - Reviews
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Review'
+        '400':
+          description: Bad Request - Validation error
+        '401':
+          description: Unauthorized - Please sign in
+        '500':
+          description: Internal Server Error
+
+  /reviews/{id}:
     get:
       summary: Get review by ID
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the review
       responses:
         '200':
           description: Review information
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Review'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Review'
         '401':
-          description: Unauthorized – Please sign in
+          description: Unauthorized - Please sign in
+        '404':
+          description: Review not found
         '500':
           description: Internal Server Error
+    
     put:
-      summary: Update review
+      summary: Update a review
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the review
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Review'
+              $ref: '#/components/schemas/ReviewUpdate'
       responses:
-        '204':
-          description: No Content
+        '200':
+          description: Review updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Review'
         '400':
-          description: Bad Request
+          description: Bad Request - Validation error
         '401':
-          description: Unauthorized – Please sign in
+          description: Unauthorized - Please sign in
+        '404':
+          description: Review not found
         '500':
           description: Internal Server Error
+    
     delete:
-      summary: Delete review
+      summary: Delete a review
+      tags:
+        - Reviews
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the review
       responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
+        '200':
+          description: Review deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: string
+                    example: Review deleted
         '401':
-          description: Unauthorized – Please sign in
+          description: Unauthorized - Please sign in
+        '404':
+          description: Review not found
         '500':
           description: Internal Server Error
 
-  /reviews/:
-    get:
-      summary: Get reviews
-      responses:
-        '200':
-          description: List of reviews
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Review'
-        '401':
-          description: Unauthorized – Please sign in
-        '500':
-          description: Internal Server Error
-    post:
-      summary: Create a new review
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Review'
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request
-        '401':
-          description: Unauthorized – Please sign in
-        '500':
-          description: Internal Server Error
+  # ==================== DAILY SONG ====================
   /dailySong/:
     get:
-      summary: Get daily song
+      summary: Get all daily songs
+      tags:
+        - Daily Song
       responses:
         '200':
-          description: Daily song information
+          description: List of all daily songs
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Daily'
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Daily'
         '401':
-          description: Unauthorized – Please sign in
+          description: Unauthorized - Please sign in
         '500':
           description: Internal Server Error
+    
     post:
-      summary: Create a new daily song
+      summary: Create a new daily song entry
+      tags:
+        - Daily Song
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Daily'
+              $ref: '#/components/schemas/DailyCreate'
       responses:
         '201':
-          description: Created
+          description: Daily song created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Daily'
         '400':
-          description: Bad Request
+          description: Bad Request - Validation error
         '401':
-          description: Unauthorized – Please sign in
+          description: Unauthorized - Please sign in
         '500':
           description: Internal Server Error
+
+  /dailySong/{id}:
     delete:
-      summary: Delete daily song
-      required: true
-      content:
-        application/json:
+      summary: Delete a daily song entry
+      tags:
+        - Daily Song
+      parameters:
+        - in: path
+          name: id
+          required: true
           schema:
-            $ref: '#/components/schemas/Daily'
+            type: string
+          description: MongoDB ObjectId of the daily song entry
       responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
+        '200':
+          description: Daily song deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Daily'
         '401':
-          description: Unauthorized – Please sign in
+          description: Unauthorized - Please sign in
+        '404':
+          description: Daily song not found
         '500':
-          description: Internal Server Error  
+          description: Internal Server Error
+
+# ==================== COMPONENTS ====================
 components:
   schemas:
     User:
       type: object
-      required:
-        - username
-        - password
       properties:
-        username:
+        _id:
           type: string
-          example: johndoe
-        password:
+          example: 507f1f77bcf86cd799439011
+        auth0Id:
           type: string
-          example: mysecretpassword
+          example: auth0|123456789
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        name:
+          type: string
+          example: John Doe
+        photo:
+          type: string
+          format: uri
+          example: https://example.com/avatar.jpg
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00.000Z
 
     Song:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        title:
+          type: string
+          example: Blinding Lights
+        artist:
+          type: array
+          items:
+            type: string
+          example: ["The Weeknd"]
+        album:
+          type: string
+          example: After Hours
+        releaseDate:
+          type: string
+          format: date
+          example: 2020-03-20
+        spotifyId:
+          type: string
+          example: 0VjIjW4GlUZAMYd2vXMi3b
+        durationMs:
+          type: integer
+          example: 200040
+        previewUrl:
+          type: string
+          format: uri
+          example: https://p.scdn.co/mp3-preview/...
+        imageUrl:
+          type: string
+          format: uri
+          example: https://i.scdn.co/image/ab67616d0000b273...
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00.000Z
+
+    SongCreate:
       type: object
       required:
         - title
@@ -247,8 +693,10 @@ components:
           type: string
           example: Blinding Lights
         artist:
-          type: string
-          example: The Weeknd
+          type: array
+          items:
+            type: string
+          example: ["The Weeknd"]
         album:
           type: string
           example: After Hours
@@ -256,20 +704,41 @@ components:
           type: string
           format: date
           example: 2020-03-20
+        spotifyId:
+          type: string
+          example: 0VjIjW4GlUZAMYd2vXMi3b
+        durationMs:
+          type: integer
+          example: 200040
+        previewUrl:
+          type: string
+          format: uri
+        imageUrl:
+          type: string
+          format: uri
 
     Review:
       type: object
-      required:
-        - songId
-        - userId
-        - rating
       properties:
+        _id:
+          type: string
+          example: 507f1f77bcf86cd799439011
         songId:
           type: string
-          example: 123
+          description: Spotify Track ID
+          example: 0VjIjW4GlUZAMYd2vXMi3b
         userId:
-          type: string
-          example: 456
+          type: object
+          properties:
+            _id:
+              type: string
+              example: 507f1f77bcf86cd799439012
+            name:
+              type: string
+              example: John Doe
+            email:
+              type: string
+              example: john.doe@example.com
         rating:
           type: integer
           minimum: 1
@@ -277,17 +746,98 @@ components:
           example: 5
         comment:
           type: string
-          example: Amazing track!
-    Daily:
+          example: Amazing track! One of my favorites.
+        hashtags:
+          type: string
+          example: "#pop #weekend #synthwave"
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00.000Z
+
+    ReviewCreate:
       type: object
       required:
         - songId
-        - userId
+        - rating
       properties:
         songId:
           type: string
-          example: 123
-        userId:
+          description: Spotify Track ID
+          example: 0VjIjW4GlUZAMYd2vXMi3b
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        comment:
           type: string
-          example: 456
+          example: Amazing track! One of my favorites.
+        hashtags:
+          type: string
+          example: "#pop #weekend #synthwave"
 
+    ReviewUpdate:
+      type: object
+      properties:
+        songId:
+          type: string
+          description: Spotify Track ID
+          example: 0VjIjW4GlUZAMYd2vXMi3b
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+        comment:
+          type: string
+          example: Updated review comment
+        hashtags:
+          type: string
+          example: "#pop #synthwave"
+
+    Daily:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 507f1f77bcf86cd799439011
+        user:
+          type: string
+          description: User MongoDB ObjectId
+          example: 507f1f77bcf86cd799439012
+        song:
+          type: string
+          description: Song MongoDB ObjectId
+          example: 507f1f77bcf86cd799439013
+        createdAt:
+          type: string
+          format: date-time
+          example: 2024-01-15T10:30:00.000Z
+
+    DailyCreate:
+      type: object
+      required:
+        - user
+        - song
+      properties:
+        user:
+          type: string
+          description: User MongoDB ObjectId
+          example: 507f1f77bcf86cd799439012
+        song:
+          type: string
+          description: Song MongoDB ObjectId
+          example: 507f1f77bcf86cd799439013
+
+  securitySchemes:
+    Auth0:
+      type: openIdConnect
+      openIdConnectUrl: https://your-auth0-domain/.well-known/openid-configuration
+
+security:
+  - Auth0: []
