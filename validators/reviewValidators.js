@@ -3,8 +3,7 @@ import { body, param } from 'express-validator';
 const createReviewValidators = [
   body('songId')
     .exists({ checkFalsy: true }).withMessage('songId is required')
-    .isMongoId().withMessage('songId must be a valid Mongo ID'),
-
+    .isString().withMessage('songId must be a Spotify ID string'), 
   body('userId')
     .optional()
     .isMongoId().withMessage('userId must be a valid Mongo ID'),
