@@ -5,7 +5,9 @@ import {
   updateSong,
   deleteSong,
   searchSpotifyController,
-  getBySpotifyId
+  getBySpotifyId,
+  addSongFromSpotify
+
 } from '../controller/songController.js';
 import { requiresAuth } from '../middleware/auth.js';
 
@@ -16,6 +18,8 @@ router.get('/search/spotify', requiresAuth(), searchSpotifyController);
 
 // Get song by Spotify ID
 router.get('/spotify/:id', requiresAuth(), getBySpotifyId);
+
+router.post('/add/spotify', requiresAuth(), addSongFromSpotify);
 
 // // Local DB routes
 router.get('/', requiresAuth(), getAllSongs);

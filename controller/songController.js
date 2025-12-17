@@ -92,6 +92,46 @@ const searchSpotifyController = asyncHandler(async (req, res) => {
   sendResponse(res, 200, true, results);
 });
 
+/**
+ * ADD song from Spotify
+ */
+const addSongFromSpotify = asyncHandler(async (req, res) => {
+  const { spotifyId } = req.body;
+  
+  if (!spotifyId) {
+    return sendResponse(res, 400, false, 'Spotify ID is required', true);
+  }
+
+  // Check if song already exists in database
+  const existingSong = await Song.findOne({ spotifyId });
+  if (existingSong) {
+    return sendResponse(res, 200, true, existingSong);
+  }
+
+  // Fetch song data from Spotify
+  const spotifyData = await fetchSongBySpotifyId(spotifyId);
+  
+  if (!spotifyData) {
+    return sendResponse(res, 404, false, 'Song not found on Spotify', true);
+  }
+
+  // Map Spotify data to your schema
+  const songData = {
+    title: spotifyData.name,
+    artist: spotifyData.artists?.map(artist => artist.name) || [],
+    album: spotifyData.album?.name,
+    releaseDate: spotifyData.album?.release_date ? new Date(spotifyData.album.release_date) : undefined,
+    spotifyId: spotifyData.id,
+    durationMs: spotifyData.duration_ms,
+    previewUrl: spotifyData.preview_url,
+    imageUrl: spotifyData.album?.images?.[0]?.url
+  };
+
+  // Save to database
+  const newSong = await Song.create(songData);
+  sendResponse(res, 201, true, newSong);
+});
+
 export {
   getAllSongs,
   createSong,
@@ -99,4 +139,5 @@ export {
   deleteSong,
   getBySpotifyId,
   searchSpotifyController,
+  addSongFromSpotify
 };
