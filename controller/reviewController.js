@@ -1,7 +1,6 @@
 // controller/reviewController.js
 
 import db from '../models/index.js';
-import fetchSpotifyTrack from '../utils/spotify.js';
 const Review = db.review;
 
 /**
