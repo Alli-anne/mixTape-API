@@ -23,42 +23,6 @@ tags:
     description: Daily song of the day feature
 
 paths:
-  # ==================== AUTHENTICATION ====================
-  /login/login:
-    get:
-      summary: Redirect to login page
-      tags:
-        - Authentication
-      responses:
-        '302':
-          description: Redirect to Auth0 login
-        '500':
-          description: Internal Server Error
-
-  /login/afterLogin:
-    get:
-      summary: Callback after successful login
-      tags:
-        - Authentication
-      responses:
-        '302':
-          description: Redirect to users page
-        '401':
-          description: Unauthorized
-        '500':
-          description: Internal Server Error
-
-  /login/logout:
-    get:
-      summary: Logout current user
-      tags:
-        - Authentication
-      responses:
-        '302':
-          description: Redirect to logout page
-        '500':
-          description: Internal Server Error
-
   # ==================== USERS ====================
   /users/:
     get:
