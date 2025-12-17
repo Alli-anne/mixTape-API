@@ -6,7 +6,8 @@ const dailySchema = new mongoose.Schema({
         ref: 'User',
     },
     song:{
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Song'
     },
      createdAt: {
         type: Date,

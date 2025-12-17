@@ -1,7 +1,9 @@
 // controller/reviewController.js
 
 import db from '../models/index.js';
+import { getSongById } from '../spotify.service.js';
 const Review = db.review;
+const Song = db.song;
 
 /**
  * Helper to handle async controllers and errors
@@ -35,10 +37,34 @@ const getReviewById = asyncHandler(async (req, res) => {
 });
 
 // CREATE a review
-const createReview = asyncHandler(async (req, res) => {
-  const newReview = await Review.create(req.body);
-  sendResponse(res, 201, true, newReview);
-});
+const createReview = async (req, res) => {
+  const { songId: spotifyId, rating, comment, hashtags } = req.body;
+
+  let song = await Song.findOne({ spotifyId });
+  if (!song) {
+    const track = await getSongById(spotifyId);
+    song = await Song.create({
+      spotifyId: track.id,
+      title: track.name,
+      artist: track.artists.map(a => a.name),
+      album: track.album.name,
+      releaseDate: track.album.release_date,
+      durationMs: track.duration_ms,
+      previewUrl: track.preview_url,
+      imageUrl: track.album.images[0]?.url
+    });
+  }
+
+  const review = await Review.create({
+    songId: song._id,
+    userId: req.user._id,
+    rating,
+    comment,
+    hashtags
+  });
+
+  res.status(201).json({ success: true, data: review });
+};
 
 // UPDATE a review
 const updateReview = asyncHandler(async (req, res) => {
