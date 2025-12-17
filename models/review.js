@@ -2,10 +2,11 @@ import mongoose from 'mongoose';
 
 
 const reviewSchema = new mongoose.Schema({
-    songId: {
-        type: String, 
-        required: true
-    },
+    songId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Song', 
+    required: true 
+  },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
